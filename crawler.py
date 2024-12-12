@@ -4,7 +4,8 @@ from whoosh.index import create_in
 from whoosh.fields import Schema, TEXT, ID
 import os
 
-def crawl(start_url, base_url):
+
+def crawl_old(start_url, base_url):
     visited = set()
     index = {}
 
@@ -20,36 +21,84 @@ def crawl(start_url, base_url):
             if url not in index[word]:
                 index[word].append(url)
 
-    def crawl_page(url):
-        try:
-            response = requests.get(url)
-            if "text/html" in response.headers["Content-Type"]:
-                soup = BeautifulSoup(response.text, "html.parser")
-                add_to_index(url, soup.get_text())
-                for link in soup.find_all("a", href=True):
-                    full_url = link["href"]
-                    if is_same_server(full_url) and full_url not in visited:
-                        visited.add(full_url)
-                        crawl_page(full_url)
-        except Exception as e:
-            print(f"Error Processing {url}: {e}")
-
-    visited.add(start_url)
-    crawl_page(start_url)
-    return index
 
 # to look up words in the index
+
+def add_to_index(url, text, index):
+    words = text.split()
+    for word in words:
+        word = word.lower()
+        if word not in index:
+            index[word] = []
+        if url not in index[word]:
+            index[word].append(url)
+
+def crawl():
+
+    index = {}
+    visited = set()
+
+    # the base URL for the website
+    prefix = 'https://vm009.rz.uos.de/crawl/'
+
+    # the initial webpage that the program will visit
+    start_url = prefix + 'index.html'
+
+    # the list of acting as a queue of URLs to visit
+    agenda = [start_url]
+
+    # the Crawling loop
+    while agenda:
+        # retrieves and removes the last URL in the list (agenda)
+        url = agenda.pop()
+        # Logs the URL being fetched for debugging or informational purposes
+        print("Get ", url)
+        # Sends an HTTP GET request to the URL
+        r = requests.get(url)
+        # Prints th HTTP response object r and its character encoding
+        # Ensures the request was successful
+        visited.add(url)
+        if r.status_code == 200:
+            # parsing the HTML
+            soup = BeautifulSoup(r.content, 'html.parser')
+            add_to_index(url, soup.get_text(), index)
+
+    return index
+
+
+# def crawl_page(url):
+#     try:
+#         response = requests.get(url)
+#         if "text/html" in response.headers["Content-Type"]:
+#             soup = BeautifulSoup(response.text, "html.parser")
+#             add_to_index(url, soup.get_text())
+#             for link in soup.find_all("a", href=True):
+#                 full_url = link["href"]
+#                 if is_same_server(full_url) and full_url not in visited:
+#                     visited.add(full_url)
+#                     crawl_page(full_url)
+#     except Exception as e:
+#         print(f"Error Processing {url}: {e}")
+#
+# visited.add(start_url)
+# crawl_page(start_url)
+# return index
+
+
 def search(index, words):
     results = []
     for word in words:
         word = word.lower()
         if word in index:
-            if results is None:
-                results = results.append(index)
+            results.append(index[word])
+    return results
 
 # Example usage
 if __name__ == "__main__":
     start_url = "https://vm009.rz.uos.de/crawl/index.html"
     base_url = "https://vm009.rz.uos.de/crawl/"
-    index = crawl(start_url, base_url)
+    index = crawl()
+    user_input = input("Enter a word to search for: ")
+    test_results = search(index, user_input.split())
     print(index)
+    print(test_results)
