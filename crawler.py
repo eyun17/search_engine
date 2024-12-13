@@ -34,22 +34,16 @@ def add_to_index(url, text, index):
             index[word].append(url)
 
 def crawl():
-
     index = {}
     visited = set()
-
     # the base URL for the website
-    prefix = 'https://vm009.rz.uos.de/crawl/'
-
+    page_list = ['index.html', 'page1.html', 'page2.html', 'page3.html']
     # the initial webpage that the program will visit
-    start_url = prefix + 'index.html'
-
-    # the list of acting as a queue of URLs to visit
-    agenda = [start_url]
-
-    # the Crawling loop
-    while agenda:
-        # retrieves and removes the last URL in the list (agenda)
+    for page in page_list:
+        current_url = base_url + page
+        # the list of acting as a queue of URLs to visit
+        agenda = [current_url]
+        # the Crawling loop
         url = agenda.pop()
         # Logs the URL being fetched for debugging or informational purposes
         print("Get ", url)
