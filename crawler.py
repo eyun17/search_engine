@@ -37,27 +37,34 @@ def crawl():
     index = {}
     visited = set()
     # the base URL for the website
-    page_list = ['index.html', 'page1.html', 'page2.html', 'page3.html']
-    # the initial webpage that the program will visit
-    for page in page_list:
-        current_url = base_url + page
-        # the list of acting as a queue of URLs to visit
-        agenda = [current_url]
-        # the Crawling loop
-        url = agenda.pop()
-        # Logs the URL being fetched for debugging or informational purposes
-        print("Get ", url)
-        # Sends an HTTP GET request to the URL
-        r = requests.get(url)
-        # Prints th HTTP response object r and its character encoding
-        # Ensures the request was successful
-        visited.add(url)
-        if r.status_code == 200:
-            # parsing the HTML
-            soup = BeautifulSoup(r.content, 'html.parser')
-            add_to_index(url, soup.get_text(), index)
+    # parse the html and check if there is a link to another page
 
-    return index
+    while start_url:
+        agd = [start_url]
+        url = agd.pop()
+        idx_page = requests.get(url)
+        soup = BeautifulSoup(idx_page.content, 'html.parser')
+        soup_list = soup.find_all("a")
+        for page in soup_list:
+            page = page.get('href')
+            current_url = base_url + page
+            # the list of acting as a queue of URLs to visit
+            agenda = [current_url]
+            # the Crawling loop
+            url = agenda.pop()
+            # Logs the URL being fetched for debugging or informational purposes
+            print("Get ", url)
+            # Sends an HTTP GET request to the URL
+            r = requests.get(url)
+            # Prints th HTTP response object r and its character encoding
+            # Ensures the request was successful
+            visited.add(url)
+            if r.status_code == 200:
+                # parsing the HTML
+                soup = BeautifulSoup(r.content, 'html.parser')
+                add_to_index(url, soup.get_text(), index)
+
+        return index
 
 
 # def crawl_page(url):

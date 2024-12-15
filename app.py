@@ -12,7 +12,4 @@ def home():
         </form>
     """
 
-@app.route("/search")
-def search():
-    ix =
 
