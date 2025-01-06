@@ -49,38 +49,45 @@ def search_whoosh_index(index_dir, query_string):
     Search the Whoosh index for a given query.
     :param index_dir: Directory where the index is stored.
     :param query_string: Query string entered by the user.
+    :return: List of search results as dictionaries.
+
     """
     index = open_dir(index_dir)
+    results_list = []
+
     with index.searcher() as searcher:
         query = QueryParser("content", index.schema).parse(query_string)
         results = searcher.search(query, limit=10)
-        
+
         if results:
-            print(f"Found {len(results)} result(s):")
             for result in results:
-                print(f"URL: {result['url']}")
-                print(f"Title: {result['title']}")
-                print("-" * 50)
+                results_list.append({
+                    "url": result["url"],
+                    "title": result["title"],
+                    "counts": len(results)
+                })
         else:
             print("No results found.")
+
+    return results_list
 
 if __name__ == "__main__":
     base_url = "https://vm009.rz.uos.de/crawl/"
     index_dir = "indexdir"
     
     # Step 1: Create the index
-    index = create_whoosh_index(index_dir)
-    
+    windex = create_whoosh_index(index_dir)
+
     # Step 2: Find all pages
     pages = find_all_pages(base_url)
     print(f"Pages found: {pages}")
     
     # Step 3: Populate the index
-    populate_whoosh_index(base_url, pages, index)
+    populate_whoosh_index(base_url, pages, windex)
     
     # Step 4: Search the index
     while True:
         user_query = input("Enter your search query (or 'exit' to quit): ")
         if user_query.lower() == "exit":
             break
-        search_whoosh_index(index_dir, user_query)
+        print(search_whoosh_index(index_dir, user_query))

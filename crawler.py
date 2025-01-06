@@ -44,9 +44,13 @@ def get_page_content(url):
     """Get the title and content of a page."""
     try:
         response = requests.get(url)
+        # to check if the request was successful
         response.raise_for_status()
+        # Parse the page
         soup = BeautifulSoup(response.content, 'html.parser')
+        # Get the title and content
         title = soup.title.string if soup.title else "No Title"
+        # Get the text content of the page
         content = soup.get_text()
         return title, content
     except requests.RequestException as e:
