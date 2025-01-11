@@ -11,13 +11,29 @@
         <div class="content-wrapper">
             <img class="logo-img" src="./images/logo_rnc.png" alt="rnc logo Image" />
             <div class="search-bar">
-                <form action="/search" method="get">
-                    <input type="text" name="q" placeholder="Search">
-                    <button type="submit">검색하기</button>
+                <form method="POST">
+                    <label for="query">Enter your query:</label>
+                    <input type="text" name="query" id="query" required>
+                    <button type="submit">Search</button>
                 </form>
                 <i class="fa-solid fa-keyboard"></i>
                 <i class="fa-solid fa-microphone"></i>
             </div>
+        </div>
+    </section>
+    <section class="results-section">
+        <div class="results-wrapper">
+            {% if results %}
+                <h2>Search Results</h2>
+                <ul>
+                    {% for result in results %}
+                        <li><a href="{{ result.url }}" target="_blank">{{ result.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% elif results is not none %}
+                <p>No results found for your query.</p>
+            {% endif %}
+            <p>Results: {{ results }}</p>
         </div>
     </section>
 </body>

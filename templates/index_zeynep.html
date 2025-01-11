@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        
+        body {
+            display: flex;
+            justify-content: center;  /* Horizontally center */
+            align-items: center;     /* Vertically center */
+            height: 100vh;           
+            margin: 0;               
+            flex-direction: column;  
+            font-family: Arial, sans-serif;
+            background-color:#FFDE59;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+    </style>
+    <title>Search</title>
+</head>
+<body>
+    <h1>Search the Website</h1>
+    <img src="static/logo_rnc.png" alt="logo Image" />
+
+    <!-- Search Form -->
+    <form method="POST">
+        <label for="query">Enter your query:</label>
+        <input type="text" name="query" id="query" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Display Search Results -->
+    {% if results %}
+        <h2>Show Results</h2>
+        {% if query %}
+            <p>Results of <strong>"{{ query }}"</strong></p>
+        {% endif %}
+        <ul>
+            {% for result in results %}
+                <li><a href="{{ result.url }}" target="_blank">{{ result.title }}</a></li>
+            {% endfor %}
+        </ul>
+    {% elif results is not none %}
+        <p>No results found for your query.</p>
+    {% endif %}
+</body>
+</html>
